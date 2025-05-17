@@ -2,11 +2,12 @@ LLVM_PATH = $(shell brew --prefix llvm)
 GTEST_PATH = $(shell brew --prefix googletest)
 
 CXX = $(LLVM_PATH)/bin/clang++
-CXXFLAGS = -std=c++23 -fopenmp -O3 -Iutils -I$(GTEST_PATH)/include -Wall -Wextra -pedantic
+CXXFLAGS = -std=c++23 -fopenmp -O3 -mavx2 -march=native -Iutils -I$(GTEST_PATH)/include -Wall -Wextra -pedantic
 LDFLAGS = -L$(LLVM_PATH)/lib -lomp -L$(GTEST_PATH)/lib -lgtest -lgtest_main -pthread
 
 UTILS_DIR = utils
 OPTIMIZATION_DIR = optimization
+ML_DIR = ml
 TEST_DIR = tests
 BIN_DIR = bin
 OBJ_DIR = obj

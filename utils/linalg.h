@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <tuple>
+#include <iostream>
 
 namespace linalg {
 /**
@@ -61,7 +62,6 @@ class Vector {
      */
     T &operator[](size_t index);
     const T &operator[](size_t index) const;
-    size_t size() const;
 
     // Operators
     Vector<T> &operator=(const Vector<T> &vec);
@@ -69,6 +69,11 @@ class Vector {
     Vector<T> operator-(const Vector<T> &vec) const;
     Vector<T> operator*(const T scalar) const;
     Vector<T> operator/(const T scalar) const;
+    Vector<T> operator*(
+        const Vector<T> &vec) const;  // Element-wise multiplication
+    Vector<T> operator/(const Vector<T> &vec) const;  // Element-wise division
+    Vector<T> &operator*=(const Vector<T> &vec);
+    Vector<T> &operator/=(const Vector<T> &vec);
     Vector<T> &operator+=(const Vector<T> &vec);
     Vector<T> &operator-=(const Vector<T> &vec);
     Vector<T> &operator*=(const T scalar);
@@ -85,11 +90,40 @@ class Vector {
     const_iterator end() const;
 
     // Methods
+
+    /*
+     * Returns the size of the vector.
+     * @return Size of the vector.
+     */
+    size_t size() const;
+
+    /*
+     * Check if vector is empty.
+     * @return True if the vector is empty, false otherwise.
+     */
+    bool empty() const;
+
+    // Accessor for the underlying data.
+    void *data();
+    const void *data() const;
+
+    /*
+     * Computes the dot product of this vector with another vector.
+     * Uses std::enable_if to enable this function only for double type.
+     * @param vec Vector to compute the dot product with.
+     * @return Dot product of the two vectors.
+     * @throws std::invalid_argument if the vectors are not of the same size.
+     */
+    template <typename U = T>
+    typename std::enable_if<std::is_same<U, double>::value, double>::type dot(
+        const Vector<U> &vec) const;
+
     /*
      * Computes the dot product of this vector with another vector.
      * @param vec Vector to compute the dot product with.
      * @return Dot product of the two vectors.
-     * @throws std::invalid_argument if the vectors are not of the same size.
+     * @throws std::invalid_argument if the vectors are not of the same
+     * size.
      */
     T dot(const Vector<T> &vec) const;
 
@@ -104,6 +138,37 @@ class Vector {
      * @throws std::runtime_error if the vector is zero-length.
      */
     void normalize(int p = 2);
+
+    /*
+     * Computes the minimum value in the vector.
+     * @return Minimum value in the vector.
+     */
+    T min() const;
+
+    /*
+     * Computes the maximum value in the vector.
+     * @return Maximum value in the vector.
+     */
+    T max() const;
+
+    /*
+     * Computes the total sum of the vector.
+     * @return Total sum of the vector.
+     */
+    T sum() const;
+
+    /*
+     * Computes the mean value of the vector.
+     * @return Mean value of the vector.
+     */
+    T mean() const;
+
+    // printing
+    /*
+     * Prints the vector to ostream.
+     * @param os Output stream to print to (default is std::cout).
+     */
+    void print(std::ostream &os = std::cout) const;
 };
 
 template <typename T = double>
@@ -156,6 +221,21 @@ class Matrix {
      * size.
      */
     Matrix(const std::vector<std::vector<T>> &mat);
+
+    /*
+     * Constructor for a matrix from a vector.
+     * @param vec Vector to initialize from.
+     * @throws std::invalid_argument if the vector is empty.
+     */
+    Matrix(const Vector<T> &vec);
+
+    /*
+     * Constructor for a matrix from a vector of vectors.
+     * @param vec Vector of vectors to initialize from.
+     * @throws std::invalid_argument if the inner vectors are not of the same
+     * size.
+     */
+    Matrix(const Vector<Vector<T>> &vec);
 
     /*
      * Copy constructor for a matrix.

@@ -2,6 +2,10 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
+#include <numeric>
+#include <iterator>
+#include <immintrin.h>
 #include "linalg.h"
 
 namespace linalg {
@@ -28,7 +32,7 @@ Vector<T>::Vector(const Vector<T> &vec) : data_(vec.data_) {}
 // Accessors
 template <typename T>
 T &Vector<T>::operator[](size_t index) {
-    if (index >= data_.size()) {
+    if (index >= size()) {
         throw std::out_of_range("Index out of bounds.");
     }
     return data_[index];
@@ -36,15 +40,10 @@ T &Vector<T>::operator[](size_t index) {
 
 template <typename T>
 const T &Vector<T>::operator[](size_t index) const {
-    if (index >= data_.size()) {
+    if (index >= size()) {
         throw std::out_of_range("Index out of bounds.");
     }
     return data_[index];
-}
-
-template <typename T>
-size_t Vector<T>::size() const {
-    return data_.size();
 }
 
 template <typename T>
@@ -57,12 +56,12 @@ Vector<T> &Vector<T>::operator=(const Vector<T> &vec) {
 
 template <typename T>
 Vector<T> Vector<T>::operator+(const Vector<T> &vec) const {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
 
-    Vector<T> result(data_.size());
-    for (size_t i = 0; i < data_.size(); ++i) {
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
         result[i] = data_[i] + vec[i];
     }
     return result;
@@ -70,12 +69,12 @@ Vector<T> Vector<T>::operator+(const Vector<T> &vec) const {
 
 template <typename T>
 Vector<T> Vector<T>::operator-(const Vector<T> &vec) const {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
 
-    Vector<T> result(data_.size());
-    for (size_t i = 0; i < data_.size(); ++i) {
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
         result[i] = data_[i] - vec[i];
     }
     return result;
@@ -83,8 +82,8 @@ Vector<T> Vector<T>::operator-(const Vector<T> &vec) const {
 
 template <typename T>
 Vector<T> Vector<T>::operator*(const T scalar) const {
-    Vector<T> result(data_.size());
-    for (size_t i = 0; i < data_.size(); ++i) {
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
         result[i] = data_[i] * scalar;
     }
     return result;
@@ -96,8 +95,8 @@ Vector<T> Vector<T>::operator/(const T scalar) const {
         throw std::invalid_argument("Division by zero.");
     }
 
-    Vector<T> result(data_.size());
-    for (size_t i = 0; i < data_.size(); ++i) {
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
         result[i] = data_[i] / scalar;
     }
     return result;
@@ -105,11 +104,11 @@ Vector<T> Vector<T>::operator/(const T scalar) const {
 
 template <typename T>
 Vector<T> &Vector<T>::operator+=(const Vector<T> &vec) {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         data_[i] += vec[i];
     }
     return *this;
@@ -117,11 +116,11 @@ Vector<T> &Vector<T>::operator+=(const Vector<T> &vec) {
 
 template <typename T>
 Vector<T> &Vector<T>::operator-=(const Vector<T> &vec) {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         data_[i] -= vec[i];
     }
     return *this;
@@ -129,7 +128,7 @@ Vector<T> &Vector<T>::operator-=(const Vector<T> &vec) {
 
 template <typename T>
 Vector<T> &Vector<T>::operator*=(const T scalar) {
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         data_[i] *= scalar;
     }
     return *this;
@@ -141,19 +140,75 @@ Vector<T> &Vector<T>::operator/=(const T scalar) {
         throw std::invalid_argument("Division by zero.");
     }
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         data_[i] /= scalar;
     }
     return *this;
 }
 
 template <typename T>
+Vector<T> Vector<T>::operator*(const Vector<T> &vec) const {
+    if (size() != vec.size()) {
+        throw std::invalid_argument("Vectors must be of the same size.");
+    }
+
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
+        result[i] = data_[i] * vec[i];
+    }
+    return result;
+}
+
+template <typename T>
+Vector<T> Vector<T>::operator/(const Vector<T> &vec) const {
+    if (size() != vec.size()) {
+        throw std::invalid_argument("Vectors must be of the same size.");
+    }
+
+    Vector<T> result(size());
+    for (size_t i = 0; i < size(); ++i) {
+        if (vec[i] == 0) {
+            throw std::invalid_argument("Division by zero.");
+        }
+        result[i] = data_[i] / vec[i];
+    }
+    return result;
+}
+
+template <typename T>
+Vector<T> &Vector<T>::operator*=(const Vector<T> &vec) {
+    if (size() != vec.size()) {
+        throw std::invalid_argument("Vectors must be of the same size.");
+    }
+
+    for (size_t i = 0; i < size(); ++i) {
+        data_[i] *= vec[i];
+    }
+    return *this;
+}
+
+template <typename T>
+Vector<T> &Vector<T>::operator/=(const Vector<T> &vec) {
+    if (size() != vec.size()) {
+        throw std::invalid_argument("Vectors must be of the same size.");
+    }
+
+    for (size_t i = 0; i < size(); ++i) {
+        if (vec[i] == 0) {
+            throw std::invalid_argument("Division by zero.");
+        }
+        data_[i] /= vec[i];
+    }
+    return *this;
+}
+
+template <typename T>
 bool Vector<T>::operator==(const Vector<T> &vec) const {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         return false;
     }
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         if (data_[i] != vec[i]) {
             return false;
         }
@@ -187,15 +242,71 @@ typename Vector<T>::const_iterator Vector<T>::end() const {
 }
 
 template <typename T>
+size_t Vector<T>::size() const {
+    return data_.size();
+}
+
+template <typename T>
+bool Vector<T>::empty() const {
+    return data_.empty();
+}
+
+template <typename T>
+void *Vector<T>::data() {
+    return data_.data();
+}
+
+template <typename T>
+const void *Vector<T>::data() const {
+    return data_.data();
+}
+
+template <typename T>
+template <typename U>
+typename std::enable_if<std::is_same<U, double>::value, double>::type
+Vector<T>::dot(const Vector<U> &vec) const {
+    if (size() != vec.size()) {
+        throw std::invalid_argument(
+            "Vectors must be of the same size for dot product.");
+    }
+
+    const size_t size = this->size();
+    const double *a = data();
+    const double *b = vec.data();
+
+    __m256d sum = _mm256_setzero_pd();
+    size_t i = 0;
+
+    // Process in chunks of 4 doubles (256 bits / 64 bits per double)
+    for (; i + 3 < size; i += 4) {
+        __m256d va = _mm256_loadu_pd(a + i);
+        __m256d vb = _mm256_loadu_pd(b + i);
+        sum = _mm256_fmadd_pd(va, vb, sum);
+    }
+
+    // Horizontal sum of the 256-bit register
+    double temp[4];
+    _mm256_storeu_pd(temp, sum);
+    double result = temp[0] + temp[1] + temp[2] + temp[3];
+
+    // Handle remaining elements (size not a multiple of 4)
+    for (; i < size; ++i) {
+        result += a[i] * b[i];
+    }
+
+    return result;
+}
+
+template <typename T>
 T Vector<T>::dot(const Vector<T> &vec) const {
-    if (data_.size() != vec.size()) {
+    if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
 
     T result = 0;
 
 #pragma omp parallel for reduction(+ : result)
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         result += data_[i] * vec[i];
     }
 
@@ -209,7 +320,7 @@ T Vector<T>::norm(int p) const {
     }
     T result = 0;
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         result += std::pow(std::abs(data_[i]), p);
     }
     return std::pow(result, 1.0 / p);
@@ -227,9 +338,52 @@ void Vector<T>::normalize(int p) {
         throw std::runtime_error("Cannot normalize a zero-norm vector.");
     }
 
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
         data_[i] /= norm_value;
     }
+}
+
+template <typename T>
+T Vector<T>::min() const {
+    if (empty()) {
+        throw std::runtime_error("Vector is empty.");
+    }
+
+    return *std::min_element(begin(), end());
+}
+
+template <typename T>
+T Vector<T>::max() const {
+    if (empty()) {
+        throw std::runtime_error("Vector is empty.");
+    }
+
+    return *std::max_element(begin(), end());
+}
+
+template <typename T>
+T Vector<T>::sum() const {
+    return std::accumulate(data_.begin(), data_.end(), T{});
+}
+
+template <typename T>
+T Vector<T>::mean() const {
+    if (empty()) {
+        throw std::runtime_error("Vector is empty.");
+    }
+    return sum() / static_cast<T>(data_.size());
+}
+
+template <typename T>
+void Vector<T>::print(std::ostream &os) const {
+    os << "[";
+    for (size_t i = 0; i < size(); ++i) {
+        os << data_[i];
+        if (i < size() - 1) {
+            os << ", ";
+        }
+    }
+    os << "]";
 }
 
 template <typename T>
@@ -271,6 +425,27 @@ Matrix<T>::Matrix(const std::vector<std::vector<T>> &mat)
 template <typename T>
 Matrix<T>::Matrix(const Matrix<T> &mat)
     : rows_(mat.rows_), cols_(mat.cols_), data_(mat.data_) {}
+
+template <typename T>
+Matrix<T>::Matrix(const Vector<T> &vec)
+    : rows_(vec.size()), cols_(1), data_(vec.size(), std::vector<T>(1)) {
+    if (vec.size() == 0) {
+        throw std::invalid_argument("Vector size must be greater than zero.");
+    }
+
+    for (size_t i = 0; i < vec.size(); ++i) {
+        data_[i][0] = vec[i];
+    }
+}
+
+template <typename T>
+Matrix<T>::Matrix(const Vector<Vector<T>> &vec)
+    : rows_(vec.size()),
+      cols_(vec[0].size()),
+      data_(vec.size(), std::vector<T>(vec[0].size())) {
+    throw std::runtime_error(
+        "Matrix constructor from Vector<Vector<T>> is not implemented.");
+}
 
 template <typename T>
 T &Matrix<T>::operator()(size_t row, size_t col) {
@@ -556,7 +731,8 @@ Matrix<T> Matrix<T>::_Gauss_Jordan_elimination() const {
         }
     }
 
-    // Extract the inverse matrix from the right side of the augmented matrix
+    // Extract the inverse matrix from the right side of the augmented
+    // matrix
     Matrix<T> inverse(rows_, cols_);
     for (size_t i = 0; i < rows_; ++i) {
         for (size_t j = 0; j < cols_; ++j) {
@@ -569,14 +745,21 @@ Matrix<T> Matrix<T>::_Gauss_Jordan_elimination() const {
 
 template <typename T>
 T Matrix<T>::spectral_norm() const {
-    // Placeholder for spectral norm calculation
-    // This is a complex operation and would typically require
-    // eigenvalue decomposition or singular value decomposition.
-    throw std::runtime_error("Spectral norm calculation not implemented.");
+    // ||A||_2 = max(sqrt(lambda_i))
+    // where lambda_i are the eigenvalues of A^T * A.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+    Matrix<T> AtA = transposed() * (*this);
+    Vector<T> eigenvalues = std::get<0>(AtA.eigen_decomposition());
+    T max_eigenvalue = eigenvalues.max();
+    return std::sqrt(max_eigenvalue);
 }
 
 template <typename T>
 T Matrix<T>::frobenius_norm() const {
+    // ||A||_F = sqrt(sum(A_ij^2))
+    // where A_ij is the element at row i and column j of matrix A.
     T sum = 0;
     for (size_t i = 0; i < rows_; ++i) {
         for (size_t j = 0; j < cols_; ++j) {
@@ -588,26 +771,40 @@ T Matrix<T>::frobenius_norm() const {
 
 template <typename T>
 T Matrix<T>::condition_number() const {
-    // Placeholder for condition number calculation
-    // This is a complex operation and would typically require
-    // eigenvalue decomposition or singular value decomposition.
-    throw std::runtime_error("Condition number calculation not implemented.");
+    // K = ||A|| * ||A^(-1)||
+    // where ||A|| is the spectral norm and ||A^(-1)|| is the spectral norm
+    // of the inverse of A.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+    Matrix<T> inv = inverse();
+    T norm_A = spectral_norm();
+    T norm_A_inv = inv.spectral_norm();
+    return norm_A * norm_A_inv;
 }
 
 template <typename T>
 T Matrix<T>::determinant() const {
+    // |A| = product of eigenvalues
+    // where A is the matrix and |A| is the determinant.
+    // The determinant is only defined for square matrices.
     if (rows_ != cols_) {
         throw std::invalid_argument("Matrix must be square.");
     }
 
-    // Placeholder for determinant calculation
-    // This is a complex operation and would typically require
-    // recursive expansion or LU decomposition.
-    throw std::runtime_error("Determinant calculation not implemented.");
+    Vector<T> eigenvalues = std::get<0>(eigen_decomposition());
+    T det = 1;
+    for (size_t i = 0; i < eigenvalues.size(); ++i) {
+        det *= eigenvalues[i];
+    }
+    return det;
 }
 
 template <typename T>
 T Matrix<T>::trace() const {
+    // Tr(A) = sum(A_ii)
+    // where A_ii is the element at row i and column i of matrix A.
+
     if (rows_ != cols_) {
         throw std::invalid_argument("Matrix must be square.");
     }
@@ -657,24 +854,25 @@ Matrix<T> Matrix<T>::cholesky_decomposition() const {
 
 template <typename T>
 std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> Matrix<T>::svd() const {
-    // Placeholder for SVD decomposition
-    // This is a complex operation and would typically require
-    // specialized libraries or algorithms.
+    // For matrix A of size m x n,
+    // U is m x m, S is m x n, and V^T is n x n.
+    // A = U * S * V^T
+
     throw std::runtime_error("SVD decomposition not implemented.");
 }
 
-}  // namespace linalg
-
 // enable arbitrary scalar multiplication
 template <typename T>
-linalg::Vector<T> operator*(const T scalar, const linalg::Vector<T> &vec) {
+Vector<T> operator*(const T scalar, const Vector<T> &vec) {
     return vec * scalar;
 }
 
 template <typename T>
-linalg::Matrix<T> operator*(const T scalar, const linalg::Matrix<T> &mat) {
+Matrix<T> operator*(const T scalar, const Matrix<T> &mat) {
     return mat * scalar;
 }
+
+}  // namespace linalg
 
 // Explicit instantiation for double type
 template class linalg::Vector<double>;
