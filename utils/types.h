@@ -92,8 +92,9 @@ class Vector {
 template <typename T = double>
 class Matrix {
    private:
+    size_t rows_;
+    size_t cols_;
     std::vector<std::vector<T>> data_;
-    size_t rows_, cols_;
 
    public:
     // Constructor
@@ -148,8 +149,8 @@ class Matrix {
      * @return Reference to the element at the given row and column.
      * @throws std::out_of_range if row or col is out of bounds.
      */
-    T &operator[](size_t row, size_t col);
-    const T &operator[](size_t row, size_t col) const;
+    T &operator()(size_t row, size_t col);
+    const T &operator()(size_t row, size_t col) const;
     size_t rows() const;
     size_t cols() const;
 
