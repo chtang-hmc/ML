@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
 
+# Build directories
+/bin/
+/obj/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -30,3 +34,10 @@
 *.exe
 *.out
 *.app
+
+# Editor and OS-specific files
+.vscode/
+.clang-format
+.idea/
+.DS_Store
+Thumbs.db
