@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "types.h"
+#include "linalg.h"
 
 // Vector Class Tests
 TEST(VectorTest, Constructor) {
@@ -239,14 +239,10 @@ TEST(MatrixTest, Constructor) {
     EXPECT_EQ(m1.rows(), 3);
     EXPECT_EQ(m1.cols(), 3);
 
-    std::cout << "1" << std::endl;
-
     // Test rows and cols constructor
     linalg::Matrix<double> m2(2, 3);
     EXPECT_EQ(m2.rows(), 2);
     EXPECT_EQ(m2.cols(), 3);
-
-    std::cout << "2" << std::endl;
 
     // Test rows, cols, and value constructor
     linalg::Matrix<double> m3(2, 3, 1.5);
@@ -257,8 +253,6 @@ TEST(MatrixTest, Constructor) {
             EXPECT_DOUBLE_EQ(m3(i, j), 1.5);
         }
     }
-
-    std::cout << "3" << std::endl;
 
     // Test std::vector constructor
     std::vector<std::vector<double>> stdMat = {
@@ -273,8 +267,6 @@ TEST(MatrixTest, Constructor) {
     EXPECT_DOUBLE_EQ(m4(2, 0), 5.0);
     EXPECT_DOUBLE_EQ(m4(2, 1), 6.0);
 
-    std::cout << "4" << std::endl;
-
     // Test copy constructor
     linalg::Matrix<double> m5(m4);
     EXPECT_EQ(m5.rows(), 3);
@@ -282,14 +274,10 @@ TEST(MatrixTest, Constructor) {
     EXPECT_DOUBLE_EQ(m5(0, 0), 1.0);
     EXPECT_DOUBLE_EQ(m5(2, 1), 6.0);
 
-    std::cout << "5" << std::endl;
-
     // Test invalid dimensions
     EXPECT_THROW(linalg::Matrix<double>(0), std::invalid_argument);
     EXPECT_THROW(linalg::Matrix<double>(0, 2), std::invalid_argument);
     EXPECT_THROW(linalg::Matrix<double>(2, 0), std::invalid_argument);
-
-    std::cout << "6" << std::endl;
 
     // Test inconsistent inner vector sizes
     std::vector<std::vector<double>> inconsistentMat = {{1.0, 2.0}, {3.0}};

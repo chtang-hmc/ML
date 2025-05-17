@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
-#include "types.h"
+#include "linalg.h"
 
 namespace linalg {
 template <typename T>
@@ -164,6 +164,26 @@ bool Vector<T>::operator==(const Vector<T> &vec) const {
 template <typename T>
 bool Vector<T>::operator!=(const Vector<T> &vec) const {
     return !(*this == vec);
+}
+
+template <typename T>
+typename Vector<T>::iterator Vector<T>::begin() {
+    return data_.begin();
+}
+
+template <typename T>
+typename Vector<T>::const_iterator Vector<T>::begin() const {
+    return data_.begin();
+}
+
+template <typename T>
+typename Vector<T>::iterator Vector<T>::end() {
+    return data_.end();
+}
+
+template <typename T>
+typename Vector<T>::const_iterator Vector<T>::end() const {
+    return data_.end();
 }
 
 template <typename T>
@@ -541,7 +561,26 @@ Matrix<T> Matrix<T>::inverse() const {
 
     return inverse;
 }
+
+template <typename T>
+std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> Matrix<T>::svd() const {
+    // filler for now
+    return std::make_tuple(Matrix<T>(rows_, cols_), Matrix<T>(cols_, cols_),
+                           Matrix<T>(cols_, cols_));
+}
+
 }  // namespace linalg
+
+// enable arbitrary scalar multiplication
+template <typename T>
+linalg::Vector<T> operator*(const T scalar, const linalg::Vector<T> &vec) {
+    return vec * scalar;
+}
+
+template <typename T>
+linalg::Matrix<T> operator*(const T scalar, const linalg::Matrix<T> &mat) {
+    return mat * scalar;
+}
 
 // Explicit instantiation for double type
 template class linalg::Vector<double>;

@@ -2,8 +2,17 @@
 #define TYPES_H
 
 #include <vector>
+#include <tuple>
 
 namespace linalg {
+/**
+ * @brief A class for representing vectors.
+ *
+ * This class provides a simple implementation of a vector with basic
+ * arithmetic operations and methods for computing norms and normalizing
+ * vectors.
+ *
+ */
 template <typename T = double>
 class Vector {
    private:
@@ -67,6 +76,14 @@ class Vector {
     bool operator==(const Vector<T> &vec) const;
     bool operator!=(const Vector<T> &vec) const;
 
+    // Iterators
+    using iterator = std::vector<T>::iterator;
+    using const_iterator = std::vector<T>::const_iterator;
+    iterator begin();
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
+
     // Methods
     /*
      * Computes the dot product of this vector with another vector.
@@ -90,6 +107,14 @@ class Vector {
 };
 
 template <typename T = double>
+/**
+ * @brief A class for representing matrices.
+ *
+ * This class provides a simple implementation of a matrix with basic
+ * arithmetic operations and methods for computing norms and normalizing
+ * matrices.
+ *
+ */
 class Matrix {
    private:
     size_t rows_;
@@ -187,7 +212,24 @@ class Matrix {
      * @throws std::runtime_error if the matrix is not invertible.
      */
     Matrix<T> inverse() const;
+
+    /*
+     * Computes the singular value decomposition of the matrix.
+     * @return SVD of the matrix.
+     */
+    std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> svd() const;
 };
+
+// enable arbitrary scalar multiplication
+template <typename T>
+Vector<T> operator*(const T scalar, const Vector<T> &vec);
+
+template <typename T>
+Matrix<T> operator*(const T scalar, const Matrix<T> &mat);
 };  // namespace linalg
+
+// Type definitions
+typedef linalg::Vector<double> Vec;
+typedef linalg::Matrix<double> Mat;
 
 #endif  // TYPES_H
