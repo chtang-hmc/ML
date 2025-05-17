@@ -11,8 +11,8 @@ TEST_DIR = tests
 BIN_DIR = bin
 OBJ_DIR = obj
 
-SRCS = $(wildcard $(UTILS_DIR)/*.cpp) $(wildcard $(OPTIMIZATION_DIR)/*.cpp)
-OBJS = $(patsubst $(UTILS_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS)) $(patsubst $(OPTIMIZATION_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+SRCS = $(wildcard $(UTILS_DIR)/*.cpp) # $(wildcard $(OPTIMIZATION_DIR)/*.cpp)
+OBJS = $(patsubst $(UTILS_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS)) # $(patsubst $(OPTIMIZATION_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
 TEST_OBJS = $(patsubst $(TEST_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(TEST_SRCS))
 TARGET = $(BIN_DIR)/linalg_test $(BIN_DIR)/gd_test

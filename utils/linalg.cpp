@@ -339,17 +339,6 @@ Matrix<T> Matrix<T>::operator-(const Matrix<T> &mat) const {
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator*(const T scalar) const {
-    Matrix<T> result(rows_, cols_);
-    for (size_t i = 0; i < rows_; ++i) {
-        for (size_t j = 0; j < cols_; ++j) {
-            result(i, j) = data_[i][j] * scalar;
-        }
-    }
-    return result;
-}
-
-template <typename T>
 Matrix<T> Matrix<T>::operator/(const T scalar) const {
     if (scalar == 0) {
         throw std::invalid_argument("Division by zero.");
@@ -438,6 +427,17 @@ bool Matrix<T>::operator!=(const Matrix<T> &mat) const {
 }
 
 template <typename T>
+Matrix<T> Matrix<T>::operator*(const T scalar) const {
+    Matrix<T> result(rows_, cols_);
+    for (size_t i = 0; i < rows_; ++i) {
+        for (size_t j = 0; j < cols_; ++j) {
+            result(i, j) = data_[i][j] * scalar;
+        }
+    }
+    return result;
+}
+
+template <typename T>
 void Matrix<T>::transpose() {
     Matrix<T> result(cols_, rows_);
     for (size_t i = 0; i < rows_; ++i) {
@@ -501,6 +501,11 @@ Matrix<T> Matrix<T>::inverse() const {
         throw std::invalid_argument("Matrix must be square.");
     }
 
+    return _Gauss_Jordan_elimination();
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::_Gauss_Jordan_elimination() const {
     // Create an augmented matrix [A|I]
     Matrix<T> augmented(rows_, 2 * cols_);
     for (size_t i = 0; i < rows_; ++i) {
@@ -563,10 +568,99 @@ Matrix<T> Matrix<T>::inverse() const {
 }
 
 template <typename T>
+T Matrix<T>::spectral_norm() const {
+    // Placeholder for spectral norm calculation
+    // This is a complex operation and would typically require
+    // eigenvalue decomposition or singular value decomposition.
+    throw std::runtime_error("Spectral norm calculation not implemented.");
+}
+
+template <typename T>
+T Matrix<T>::frobenius_norm() const {
+    T sum = 0;
+    for (size_t i = 0; i < rows_; ++i) {
+        for (size_t j = 0; j < cols_; ++j) {
+            sum += data_[i][j] * data_[i][j];
+        }
+    }
+    return std::sqrt(sum);
+}
+
+template <typename T>
+T Matrix<T>::condition_number() const {
+    // Placeholder for condition number calculation
+    // This is a complex operation and would typically require
+    // eigenvalue decomposition or singular value decomposition.
+    throw std::runtime_error("Condition number calculation not implemented.");
+}
+
+template <typename T>
+T Matrix<T>::determinant() const {
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    // Placeholder for determinant calculation
+    // This is a complex operation and would typically require
+    // recursive expansion or LU decomposition.
+    throw std::runtime_error("Determinant calculation not implemented.");
+}
+
+template <typename T>
+T Matrix<T>::trace() const {
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    T sum = 0;
+    for (size_t i = 0; i < rows_; ++i) {
+        sum += data_[i][i];
+    }
+    return sum;
+}
+
+template <typename T>
+std::tuple<Vector<T>, Matrix<T>> Matrix<T>::eigen_decomposition() const {
+    // Placeholder for eigen decomposition
+    // This is a complex operation and would typically require
+    // specialized libraries or algorithms.
+    throw std::runtime_error("Eigen decomposition not implemented.");
+}
+
+template <typename T>
+std::tuple<Matrix<T>, Matrix<T>> Matrix<T>::qr_decomposition() const {
+    // Placeholder for QR decomposition
+    // This is a complex operation and would typically require
+    // specialized libraries or algorithms.
+    throw std::runtime_error("QR decomposition not implemented.");
+}
+
+template <typename T>
+std::tuple<Matrix<T>, Matrix<T>> Matrix<T>::lu_decomposition() const {
+    // Placeholder for LU decomposition
+    // This is a complex operation and would typically require
+    // specialized libraries or algorithms.
+    throw std::runtime_error("LU decomposition not implemented.");
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::cholesky_decomposition() const {
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    // Placeholder for Cholesky decomposition
+    // This is a complex operation and would typically require
+    // specialized libraries or algorithms.
+    throw std::runtime_error("Cholesky decomposition not implemented.");
+}
+
+template <typename T>
 std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> Matrix<T>::svd() const {
-    // filler for now
-    return std::make_tuple(Matrix<T>(rows_, cols_), Matrix<T>(cols_, cols_),
-                           Matrix<T>(cols_, cols_));
+    // Placeholder for SVD decomposition
+    // This is a complex operation and would typically require
+    // specialized libraries or algorithms.
+    throw std::runtime_error("SVD decomposition not implemented.");
 }
 
 }  // namespace linalg

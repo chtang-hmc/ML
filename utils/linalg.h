@@ -214,10 +214,73 @@ class Matrix {
     Matrix<T> inverse() const;
 
     /*
+     * Computes the spectral norm of the matrix.
+     * @return Spectral norm of the matrix.
+     */
+    T spectral_norm() const;
+
+    /*
+     * Computes the Frobenius norm of the matrix.
+     * @return Frobenius norm of the matrix.
+     */
+    T frobenius_norm() const;
+
+    /*
+     * Computes the condition number of the matrix.
+     * @return Condition number of the matrix.
+     */
+    T condition_number() const;
+
+    /*
+     * Computes the determinant of the matrix.
+     * @return Determinant of the matrix.
+     */
+    T determinant() const;
+
+    /*
+     * Computes the trace of the matrix.
+     * @return Trace of the matrix.
+     */
+    T trace() const;
+
+    /*
+     * Computes the eigen decomposition of the matrix.
+     * @return Eigenvalues and eigenvectors of the matrix.
+     */
+    std::tuple<Vector<T>, Matrix<T>> eigen_decomposition() const;
+
+    /*
+     * Computes the QR decomposition of the matrix.
+     * @return Q and R matrices of the QR decomposition.
+     */
+    std::tuple<Matrix<T>, Matrix<T>> qr_decomposition() const;
+
+    /*
+     * Computes the LU decomposition of the matrix.
+     * @return L and U matrices of the LU decomposition.
+     */
+    std::tuple<Matrix<T>, Matrix<T>> lu_decomposition() const;
+
+    /*
+     * Computes the Cholesky decomposition of the matrix.
+     * @return L matrix of the Cholesky decomposition.
+     */
+    Matrix<T> cholesky_decomposition() const;
+
+    /*
      * Computes the singular value decomposition of the matrix.
      * @return SVD of the matrix.
      */
     std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> svd() const;
+
+   private:
+    /*
+     * Helper function to perform Gauss-Jordan elimination. Assumes the matrix
+     * is square.
+     * @return Inverse of the matrix.
+     * @throws std::runtime_error if the matrix is not invertible.
+     */
+    Matrix<T> _Gauss_Jordan_elimination() const;
 };
 
 // enable arbitrary scalar multiplication
