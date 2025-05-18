@@ -2,6 +2,8 @@
 #define OPTIMIZER_H
 
 #include <functional>
+#include <vector>
+#include <tuple>
 #include "../utils/linalg.h"
 
 /**
@@ -36,11 +38,25 @@ class Optimizer {
      * @param objective The objective function to minimize
      * @param gradient The gradient function of the objective
      * @param initial_point Starting point for optimization
+     * @param verbose Whether to print progress
      * @return The optimal point found
      */
     virtual Vec minimize(const ObjectiveFunction& objective,
                          const GradientFunction& gradient,
-                         const Vec& initial_point) = 0;
+                         const Vec& initial_point, bool verbose = false) = 0;
+
+    /**
+     * @brief Minimize the objective function and return the history of points
+     * @param objective The objective function to minimize
+     * @param gradient The gradient function of the objective
+     * @param initial_point Starting point for optimization
+     * @param verbose Whether to print progress
+     * @return A vector of tuples of points and their corresponding
+     * function values
+     */
+    virtual std::vector<std::tuple<Vec, double>> minimize_history(
+        const ObjectiveFunction& objective, const GradientFunction& gradient,
+        const Vec& initial_point, bool verbose = false) = 0;
 
     // Getters and setters for optimization parameters
     double get_learning_rate() const { return learning_rate_; }

@@ -1,12 +1,12 @@
+#include "linalg.h"
+#include <immintrin.h>
 #include <omp.h>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <stdexcept>
-#include <algorithm>
-#include <numeric>
 #include <iterator>
-#include <immintrin.h>
-#include "linalg.h"
+#include <numeric>
+#include <stdexcept>
 
 namespace linalg {
 template <typename T>
@@ -17,21 +17,33 @@ Vector<T>::Vector(size_t size) : data_(size) {
 }
 
 template <typename T>
-Vector<T>::Vector(size_t size, const T &value) : data_(size, value) {
+Vector<T>::Vector(size_t size, const T& value) : data_(size, value) {
     if (size == 0) {
         throw std::invalid_argument("Size must be greater than zero.");
     }
 }
 
 template <typename T>
-Vector<T>::Vector(const std::vector<T> &vec) : data_(vec) {}
+Vector<T>::Vector(const std::vector<T>& vec) : data_(vec) {}
 
 template <typename T>
-Vector<T>::Vector(const Vector<T> &vec) : data_(vec.data_) {}
+Vector<T>::Vector(const T* arr, size_t size) : data_(arr, arr + size) {
+    if (size == 0) {
+        throw std::invalid_argument("Size must be greater than zero.");
+    }
+}
+
+template <typename T>
+Vector<T>::Vector(const Vector<T>& vec) : data_(vec.data_) {}
+
+template <typename T>
+Vector<T>::operator std::vector<T>() const {
+    return data_;
+}
 
 // Accessors
 template <typename T>
-T &Vector<T>::operator[](size_t index) {
+T& Vector<T>::operator[](size_t index) {
     if (index >= size()) {
         throw std::out_of_range("Index out of bounds.");
     }
@@ -39,7 +51,7 @@ T &Vector<T>::operator[](size_t index) {
 }
 
 template <typename T>
-const T &Vector<T>::operator[](size_t index) const {
+const T& Vector<T>::operator[](size_t index) const {
     if (index >= size()) {
         throw std::out_of_range("Index out of bounds.");
     }
@@ -47,7 +59,7 @@ const T &Vector<T>::operator[](size_t index) const {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator=(const Vector<T> &vec) {
+Vector<T>& Vector<T>::operator=(const Vector<T>& vec) {
     if (this != &vec) {
         data_ = vec.data_;
     }
@@ -55,7 +67,7 @@ Vector<T> &Vector<T>::operator=(const Vector<T> &vec) {
 }
 
 template <typename T>
-Vector<T> Vector<T>::operator+(const Vector<T> &vec) const {
+Vector<T> Vector<T>::operator+(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -68,7 +80,7 @@ Vector<T> Vector<T>::operator+(const Vector<T> &vec) const {
 }
 
 template <typename T>
-Vector<T> Vector<T>::operator-(const Vector<T> &vec) const {
+Vector<T> Vector<T>::operator-(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -103,7 +115,7 @@ Vector<T> Vector<T>::operator/(const T scalar) const {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator+=(const Vector<T> &vec) {
+Vector<T>& Vector<T>::operator+=(const Vector<T>& vec) {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -115,7 +127,7 @@ Vector<T> &Vector<T>::operator+=(const Vector<T> &vec) {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator-=(const Vector<T> &vec) {
+Vector<T>& Vector<T>::operator-=(const Vector<T>& vec) {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -127,7 +139,7 @@ Vector<T> &Vector<T>::operator-=(const Vector<T> &vec) {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator*=(const T scalar) {
+Vector<T>& Vector<T>::operator*=(const T scalar) {
     for (size_t i = 0; i < size(); ++i) {
         data_[i] *= scalar;
     }
@@ -135,7 +147,7 @@ Vector<T> &Vector<T>::operator*=(const T scalar) {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator/=(const T scalar) {
+Vector<T>& Vector<T>::operator/=(const T scalar) {
     if (scalar == 0) {
         throw std::invalid_argument("Division by zero.");
     }
@@ -147,7 +159,7 @@ Vector<T> &Vector<T>::operator/=(const T scalar) {
 }
 
 template <typename T>
-Vector<T> Vector<T>::operator*(const Vector<T> &vec) const {
+Vector<T> Vector<T>::operator*(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -160,7 +172,7 @@ Vector<T> Vector<T>::operator*(const Vector<T> &vec) const {
 }
 
 template <typename T>
-Vector<T> Vector<T>::operator/(const Vector<T> &vec) const {
+Vector<T> Vector<T>::operator/(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -176,7 +188,7 @@ Vector<T> Vector<T>::operator/(const Vector<T> &vec) const {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator*=(const Vector<T> &vec) {
+Vector<T>& Vector<T>::operator*=(const Vector<T>& vec) {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -188,7 +200,7 @@ Vector<T> &Vector<T>::operator*=(const Vector<T> &vec) {
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator/=(const Vector<T> &vec) {
+Vector<T>& Vector<T>::operator/=(const Vector<T>& vec) {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -203,7 +215,7 @@ Vector<T> &Vector<T>::operator/=(const Vector<T> &vec) {
 }
 
 template <typename T>
-bool Vector<T>::operator==(const Vector<T> &vec) const {
+bool Vector<T>::operator==(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         return false;
     }
@@ -217,7 +229,7 @@ bool Vector<T>::operator==(const Vector<T> &vec) const {
 }
 
 template <typename T>
-bool Vector<T>::operator!=(const Vector<T> &vec) const {
+bool Vector<T>::operator!=(const Vector<T>& vec) const {
     return !(*this == vec);
 }
 
@@ -252,27 +264,27 @@ bool Vector<T>::empty() const {
 }
 
 template <typename T>
-void *Vector<T>::data() {
+void* Vector<T>::data() {
     return data_.data();
 }
 
 template <typename T>
-const void *Vector<T>::data() const {
+const void* Vector<T>::data() const {
     return data_.data();
 }
 
 template <typename T>
 template <typename U>
 typename std::enable_if<std::is_same<U, double>::value, double>::type
-Vector<T>::dot(const Vector<U> &vec) const {
+Vector<T>::dot(const Vector<U>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument(
             "Vectors must be of the same size for dot product.");
     }
 
     const size_t size = this->size();
-    const double *a = data();
-    const double *b = vec.data();
+    const double* a = data();
+    const double* b = vec.data();
 
     __m256d sum = _mm256_setzero_pd();
     size_t i = 0;
@@ -298,7 +310,7 @@ Vector<T>::dot(const Vector<U> &vec) const {
 }
 
 template <typename T>
-T Vector<T>::dot(const Vector<T> &vec) const {
+T Vector<T>::dot(const Vector<T>& vec) const {
     if (size() != vec.size()) {
         throw std::invalid_argument("Vectors must be of the same size.");
     }
@@ -344,6 +356,13 @@ void Vector<T>::normalize(int p) {
 }
 
 template <typename T>
+void Vector<T>::abs() {
+    for (size_t i = 0; i < size(); ++i) {
+        data_[i] = std::abs(data_[i]);
+    }
+}
+
+template <typename T>
 T Vector<T>::min() const {
     if (empty()) {
         throw std::runtime_error("Vector is empty.");
@@ -375,7 +394,7 @@ T Vector<T>::mean() const {
 }
 
 template <typename T>
-void Vector<T>::print(std::ostream &os) const {
+void Vector<T>::print(std::ostream& os) const {
     os << "[";
     for (size_t i = 0; i < size(); ++i) {
         os << data_[i];
@@ -404,7 +423,7 @@ Matrix<T>::Matrix(size_t rows, size_t cols)
 }
 
 template <typename T>
-Matrix<T>::Matrix(size_t rows, size_t cols, const T &value)
+Matrix<T>::Matrix(size_t rows, size_t cols, const T& value)
     : rows_(rows), cols_(cols), data_(rows, std::vector<T>(cols, value)) {
     if (rows == 0 || cols == 0) {
         throw std::invalid_argument(
@@ -413,9 +432,9 @@ Matrix<T>::Matrix(size_t rows, size_t cols, const T &value)
 }
 
 template <typename T>
-Matrix<T>::Matrix(const std::vector<std::vector<T>> &mat)
+Matrix<T>::Matrix(const std::vector<std::vector<T>>& mat)
     : rows_(mat.size()), cols_(mat[0].size()), data_(mat) {
-    for (const auto &row : mat) {
+    for (const auto& row : mat) {
         if (row.size() != cols_) {
             throw std::invalid_argument("All rows must be of the same size.");
         }
@@ -423,11 +442,11 @@ Matrix<T>::Matrix(const std::vector<std::vector<T>> &mat)
 }
 
 template <typename T>
-Matrix<T>::Matrix(const Matrix<T> &mat)
+Matrix<T>::Matrix(const Matrix<T>& mat)
     : rows_(mat.rows_), cols_(mat.cols_), data_(mat.data_) {}
 
 template <typename T>
-Matrix<T>::Matrix(const Vector<T> &vec)
+Matrix<T>::Matrix(const Vector<T>& vec)
     : rows_(vec.size()), cols_(1), data_(vec.size(), std::vector<T>(1)) {
     if (vec.size() == 0) {
         throw std::invalid_argument("Vector size must be greater than zero.");
@@ -439,7 +458,7 @@ Matrix<T>::Matrix(const Vector<T> &vec)
 }
 
 template <typename T>
-Matrix<T>::Matrix(const Vector<Vector<T>> &vec)
+Matrix<T>::Matrix(const Vector<Vector<T>>& vec)
     : rows_(vec.size()),
       cols_(vec[0].size()),
       data_(vec.size(), std::vector<T>(vec[0].size())) {
@@ -448,7 +467,21 @@ Matrix<T>::Matrix(const Vector<Vector<T>> &vec)
 }
 
 template <typename T>
-T &Matrix<T>::operator()(size_t row, size_t col) {
+Matrix<T>::operator std::vector<std::vector<T>>() const {
+    return data_;
+}
+
+template <typename T>
+Matrix<T>::operator Vector<Vector<T>>() const {
+    Vector<Vector<T>> result(rows_);
+    for (size_t i = 0; i < rows_; ++i) {
+        result[i] = Vector<T>(data_[i]);
+    }
+    return result;
+}
+
+template <typename T>
+T& Matrix<T>::operator()(size_t row, size_t col) {
     if (row >= rows_ || col >= cols_) {
         throw std::out_of_range("Index out of bounds.");
     }
@@ -456,11 +489,27 @@ T &Matrix<T>::operator()(size_t row, size_t col) {
 }
 
 template <typename T>
-const T &Matrix<T>::operator()(size_t row, size_t col) const {
+const T& Matrix<T>::operator()(size_t row, size_t col) const {
     if (row >= rows_ || col >= cols_) {
         throw std::out_of_range("Index out of bounds.");
     }
     return data_[row][col];
+}
+
+template <typename T>
+std::vector<T>& Matrix<T>::operator[](size_t row) {
+    if (row >= rows_) {
+        throw std::out_of_range("Row index out of bounds.");
+    }
+    return data_[row];
+}
+
+template <typename T>
+const std::vector<T>& Matrix<T>::operator[](size_t row) const {
+    if (row >= rows_) {
+        throw std::out_of_range("Row index out of bounds.");
+    }
+    return data_[row];
 }
 
 template <typename T>
@@ -474,7 +523,41 @@ size_t Matrix<T>::cols() const {
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator=(const Matrix<T> &mat) {
+Vector<T> Matrix<T>::row(size_t row) const {
+    if (row >= rows_) {
+        throw std::out_of_range("Row index out of bounds.");
+    }
+    return Vector<T>(data_[row]);
+}
+
+template <typename T>
+Vector<T> Matrix<T>::col(size_t col) const {
+    if (col >= cols_) {
+        throw std::out_of_range("Column index out of bounds.");
+    }
+
+    Vector<T> result(rows_);
+    for (size_t i = 0; i < rows_; ++i) {
+        result[i] = data_[i][col];
+    }
+    return result;
+}
+
+template <typename T>
+Vector<T> Matrix<T>::diag() const {
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    Vector<T> result(rows_);
+    for (size_t i = 0; i < rows_; ++i) {
+        result[i] = data_[i][i];
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T>& Matrix<T>::operator=(const Matrix<T>& mat) {
     if (this != &mat) {
         rows_ = mat.rows_;
         cols_ = mat.cols_;
@@ -484,7 +567,7 @@ Matrix<T> &Matrix<T>::operator=(const Matrix<T> &mat) {
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T> &mat) const {
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& mat) const {
     if (rows_ != mat.rows_ || cols_ != mat.cols_) {
         throw std::invalid_argument("Matrices must be of the same size.");
     }
@@ -499,7 +582,7 @@ Matrix<T> Matrix<T>::operator+(const Matrix<T> &mat) const {
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator-(const Matrix<T> &mat) const {
+Matrix<T> Matrix<T>::operator-(const Matrix<T>& mat) const {
     if (rows_ != mat.rows_ || cols_ != mat.cols_) {
         throw std::invalid_argument("Matrices must be of the same size.");
     }
@@ -529,7 +612,7 @@ Matrix<T> Matrix<T>::operator/(const T scalar) const {
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &mat) {
+Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& mat) {
     if (rows_ != mat.rows_ || cols_ != mat.cols_) {
         throw std::invalid_argument("Matrices must be of the same size.");
     }
@@ -543,7 +626,7 @@ Matrix<T> &Matrix<T>::operator+=(const Matrix<T> &mat) {
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &mat) {
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& mat) {
     if (rows_ != mat.rows_ || cols_ != mat.cols_) {
         throw std::invalid_argument("Matrices must be of the same size.");
     }
@@ -557,7 +640,7 @@ Matrix<T> &Matrix<T>::operator-=(const Matrix<T> &mat) {
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator*=(const T scalar) {
+Matrix<T>& Matrix<T>::operator*=(const T scalar) {
     for (size_t i = 0; i < rows_; ++i) {
         for (size_t j = 0; j < cols_; ++j) {
             data_[i][j] *= scalar;
@@ -567,7 +650,7 @@ Matrix<T> &Matrix<T>::operator*=(const T scalar) {
 }
 
 template <typename T>
-Matrix<T> &Matrix<T>::operator/=(const T scalar) {
+Matrix<T>& Matrix<T>::operator/=(const T scalar) {
     if (scalar == 0) {
         throw std::invalid_argument("Division by zero.");
     }
@@ -581,7 +664,7 @@ Matrix<T> &Matrix<T>::operator/=(const T scalar) {
 }
 
 template <typename T>
-bool Matrix<T>::operator==(const Matrix<T> &mat) const {
+bool Matrix<T>::operator==(const Matrix<T>& mat) const {
     if (rows_ != mat.rows_ || cols_ != mat.cols_) {
         return false;
     }
@@ -597,7 +680,7 @@ bool Matrix<T>::operator==(const Matrix<T> &mat) const {
 }
 
 template <typename T>
-bool Matrix<T>::operator!=(const Matrix<T> &mat) const {
+bool Matrix<T>::operator!=(const Matrix<T>& mat) const {
     return !(*this == mat);
 }
 
@@ -624,7 +707,18 @@ void Matrix<T>::transpose() {
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T> &mat) const {
+Matrix<T> Matrix<T>::transposed() const {
+    Matrix<T> result(cols_, rows_);
+    for (size_t i = 0; i < rows_; ++i) {
+        for (size_t j = 0; j < cols_; ++j) {
+            result(j, i) = data_[i][j];
+        }
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator*(const Matrix<T>& mat) const {
     if (cols_ != mat.rows_) {
         throw std::invalid_argument(
             "Matrices must be compatible for multiplication.");
@@ -643,7 +737,7 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T> &mat) const {
 }
 
 template <typename T>
-Vector<T> Matrix<T>::operator*(const Vector<T> &vec) const {
+Vector<T> Matrix<T>::operator*(const Vector<T>& vec) const {
     if (cols_ != vec.size()) {
         throw std::invalid_argument(
             "Matrix and vector sizes are incompatible.");
@@ -654,17 +748,6 @@ Vector<T> Matrix<T>::operator*(const Vector<T> &vec) const {
         result[i] = 0;
         for (size_t j = 0; j < cols_; ++j) {
             result[i] += data_[i][j] * vec[j];
-        }
-    }
-    return result;
-}
-
-template <typename T>
-Matrix<T> Matrix<T>::transposed() const {
-    Matrix<T> result(cols_, rows_);
-    for (size_t i = 0; i < rows_; ++i) {
-        for (size_t j = 0; j < cols_; ++j) {
-            result(j, i) = data_[i][j];
         }
     }
     return result;
@@ -770,6 +853,11 @@ T Matrix<T>::frobenius_norm() const {
 }
 
 template <typename T>
+T Matrix<T>::norm() const {
+    return spectral_norm();
+}
+
+template <typename T>
 T Matrix<T>::condition_number() const {
     // K = ||A|| * ||A^(-1)||
     // where ||A|| is the spectral norm and ||A^(-1)|| is the spectral norm
@@ -778,8 +866,8 @@ T Matrix<T>::condition_number() const {
         throw std::invalid_argument("Matrix must be square.");
     }
     Matrix<T> inv = inverse();
-    T norm_A = spectral_norm();
-    T norm_A_inv = inv.spectral_norm();
+    T norm_A = norm();
+    T norm_A_inv = inv.norm();
     return norm_A * norm_A_inv;
 }
 
@@ -818,10 +906,118 @@ T Matrix<T>::trace() const {
 
 template <typename T>
 std::tuple<Vector<T>, Matrix<T>> Matrix<T>::eigen_decomposition() const {
-    // Placeholder for eigen decomposition
-    // This is a complex operation and would typically require
-    // specialized libraries or algorithms.
-    throw std::runtime_error("Eigen decomposition not implemented.");
+    // For matrix A of size n x n,
+    // eigenvalues is a vector of size n,
+    // and eigenvectors is a matrix of size n x n.
+    // A = V * D * V^T
+    // where D is a diagonal matrix of eigenvalues and V is the matrix of
+    // eigenvectors.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    // perform Arnoldi iteration to get upper Hessenberg form
+    auto [Q, H] = arnoldi_iteration(Vector<T>(rows_, 1.0), rows_);
+
+    // perform QR iteration to get eigenvalues and eigenvectors
+    auto [eigenvalues, R] = H.qr_iteration(1000, 1e-6);
+
+    // reconstruct the eigenvectors
+    Matrix<T> V = Q * R;  // V = Q * R
+
+    return std::make_tuple(eigenvalues, V);
+}
+
+template <typename T>
+std::tuple<T, Vector<T>> Matrix<T>::power_iteration(size_t max_iter,
+                                                    double tol) const {
+    // Power iteration method to find the largest eigenvalue and its
+    // corresponding eigenvector.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    if (rows_ == 0) {
+        throw std::invalid_argument("Matrix must be non-empty.");
+    }
+
+    Vector<T> x(rows_, 1.0);  // Initial guess for the eigenvector
+    T eigenvalue = 0;
+
+    for (size_t i = 0; i < max_iter; ++i) {
+        Vector<T> y = (*this) * x;
+        eigenvalue = y.norm();  // Compute the norm of y
+        if (eigenvalue == 0) {
+            throw std::runtime_error("Matrix is singular.");
+        }
+        x = y / eigenvalue;  // Normalize the eigenvector
+        if (i > 0 && std::abs(eigenvalue - x.dot(y)) < tol) {
+            break;  // Convergence check
+        }
+    }
+
+    return std::make_tuple(eigenvalue, x);
+}
+
+template <typename T>
+std::tuple<Matrix<T>, Matrix<T>> Matrix<T>::arnoldi_iteration(
+    const Vector<T>& vec, size_t m) const {
+    // Arnoldi iteration to transform the matrix to Hessenberg form.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    if (vec.size() != rows_) {
+        throw std::invalid_argument("Vector size must match matrix size.");
+    }
+
+    if (m > rows_) {
+        throw std::invalid_argument(
+            "m must be less than or equal to the number "
+            "of rows of the matrix.");
+    }
+
+    size_t n = vec.size();
+    T norm = vec.norm();
+    if (norm == 0) {
+        throw std::runtime_error("Vector cannot be zero.");
+    }
+    Matrix<T> Q(n, m + 1);
+    Matrix<T> H(m + 1, m);
+
+    // initialize Q with the input vector
+    for (size_t i = 0; i < n; ++i) {
+        Q(i, 0) = vec[i] / norm;
+    }
+
+    for (size_t j = 0; j < m; ++j) {
+        // Compute the next vector
+        Vector<T> v = (*this) * Q.col(j);
+        for (size_t i = 0; i <= j; ++i) {
+            H(i, j) = Q.col(i).dot(v);
+            v -= H(i, j) * Q.col(i);
+        }
+        H(j + 1, j) = v.norm();
+        if (H(j + 1, j) == 0) {
+            throw std::runtime_error("Matrix is singular.");
+        }
+        for (size_t i = 0; i < n; ++i) {
+            Q(i, j + 1) = v[i] / H(j + 1, j);
+        }
+    }
+
+    return std::make_tuple(Q, H);
+}
+
+template <typename T>
+std::tuple<Vector<T>, Matrix<T>> Matrix<T>::qr_iteration(size_t max_iter,
+                                                         double tol) const {
+    // QR iteration method to find the eigenvalues and eigenvectors.
+    if (rows_ != cols_) {
+        throw std::invalid_argument("Matrix must be square.");
+    }
+
+    throw std::runtime_error("QR iteration not implemented.");
 }
 
 template <typename T>
@@ -863,12 +1059,12 @@ std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> Matrix<T>::svd() const {
 
 // enable arbitrary scalar multiplication
 template <typename T>
-Vector<T> operator*(const T scalar, const Vector<T> &vec) {
+Vector<T> operator*(const T scalar, const Vector<T>& vec) {
     return vec * scalar;
 }
 
 template <typename T>
-Matrix<T> operator*(const T scalar, const Matrix<T> &mat) {
+Matrix<T> operator*(const T scalar, const Matrix<T>& mat) {
     return mat * scalar;
 }
 

@@ -37,7 +37,6 @@
 
 # Editor and OS-specific files
 .vscode/
-.clang-format
 .idea/
 .DS_Store
 Thumbs.db

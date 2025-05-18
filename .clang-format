@@ -1,0 +1,15 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+PreprocessorDirectiveIndentation: AfterHash
+StatementMacros:
+  - "#pragma omp parallel"
+  - "#pragma omp for"
+  - "#pragma omp critical"
+
+SpacesInParentheses: false
+SortIncludes: false
+---
+
